@@ -1,0 +1,20 @@
+Program antrax {
+    Fx: int @sum(int $a, int $b){
+        int $c = $a + $b;
+        return $c;
+    };
+    int $res = @sum(4,5);
+
+    string $d ="resultado:";
+    print($d);
+    print($res);
+    print(@sum(8,5));
+
+    try{
+        print($d + $res);
+    } catch $e {
+        print("ocurrio un error");
+        print($e);
+    };
+
+};

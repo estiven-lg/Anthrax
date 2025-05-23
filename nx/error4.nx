@@ -1,0 +1,3 @@
+Program antrax {
+    print(@sum(8,5));
+};

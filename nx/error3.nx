@@ -1,0 +1,13 @@
+Program antrax {
+    Fx: int @sum(int $a, int $b){
+        int $c = $a + $b;
+        return $c;
+    };
+
+    Fx: int @sum(int $a, int $b){
+        int $c = $a + $b;
+        return $c;
+    };
+
+    print(@sum(8,5));
+};

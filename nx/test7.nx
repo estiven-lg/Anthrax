@@ -1,0 +1,5 @@
+Program antrax {
+    for (int $x = 0; $x < 20; $x = $x + 5) {
+        print($x);
+    };
+}

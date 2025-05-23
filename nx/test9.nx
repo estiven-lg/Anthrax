@@ -1,0 +1,10 @@
+Program antrax {
+    int $password = 123554;
+
+    if ($password == 1234) {
+        print("Acceso concedido");
+    } else {
+        print("Acceso denegado");
+        print("Verifica tus credenciales");
+    };
+}

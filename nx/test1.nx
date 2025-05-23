@@ -1,0 +1,10 @@
+Program antrax {
+    Fx: int @sum(int $a, int $b){
+        int $c = $a + $b;
+        return $c;
+    };
+
+    print(@sum(10,5));
+    print(@sum(10,25));
+};
+
