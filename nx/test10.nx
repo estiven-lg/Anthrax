@@ -7,5 +7,6 @@ Program antrax {
         return $n * @factoria($n-1) ;
     };
 
-    print(@factoria(5));
+    print(@factoria(25));
 }
+

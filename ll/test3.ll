@@ -1,54 +1,60 @@
-; ModuleID = "AntraxModule"
+; ModuleID = './ll/temp.ll'
+source_filename = "./ll/temp.ll"
 target triple = "x86_64-pc-linux-gnu"
-target datalayout = ""
 
-define i32 @"main"()
-{
+@fmt = internal constant [4 x i8] c"%d\0A\00"
+
+; Function Attrs: nofree nounwind
+define i128 @main() local_unnamed_addr #0 {
 entry:
-  %"$x" = alloca i32
-  store i32 0, i32* %"$x"
-  br label %"for.cond"
-for.cond:
-  %"$x.1" = load i32, i32* %"$x"
-  %"cmplttmp" = icmp slt i32 %"$x.1", 10
-  br i1 %"cmplttmp", label %"for.body", label %"for.end"
-for.body:
-  %"$x.2" = load i32, i32* %"$x"
-  %".5" = call i32 @"fib"(i32 %"$x.2")
-  %".6" = bitcast [4 x i8]* @"fmt" to i8*
-  %".7" = call i32 (i8*, ...) @"printf"(i8* %".6", i32 %".5")
-  br label %"for.inc"
-for.inc:
-  %"$x.3" = load i32, i32* %"$x"
-  %"addtmp" = add i32 %"$x.3", 1
-  store i32 %"addtmp", i32* %"$x"
-  br label %"for.cond"
-for.end:
-  ret i32 0
+  %.5 = tail call i128 @fib(i128 0)
+  %.7 = tail call i128 (i8*, ...) @printf(i8* nonnull dereferenceable(1) getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i64 0, i64 0), i128 %.5)
+  %.5.1 = tail call i128 @fib(i128 1)
+  %.7.1 = tail call i128 (i8*, ...) @printf(i8* nonnull dereferenceable(1) getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i64 0, i64 0), i128 %.5.1)
+  %.5.2 = tail call i128 @fib(i128 2)
+  %.7.2 = tail call i128 (i8*, ...) @printf(i8* nonnull dereferenceable(1) getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i64 0, i64 0), i128 %.5.2)
+  %.5.3 = tail call i128 @fib(i128 3)
+  %.7.3 = tail call i128 (i8*, ...) @printf(i8* nonnull dereferenceable(1) getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i64 0, i64 0), i128 %.5.3)
+  %.5.4 = tail call i128 @fib(i128 4)
+  %.7.4 = tail call i128 (i8*, ...) @printf(i8* nonnull dereferenceable(1) getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i64 0, i64 0), i128 %.5.4)
+  %.5.5 = tail call i128 @fib(i128 5)
+  %.7.5 = tail call i128 (i8*, ...) @printf(i8* nonnull dereferenceable(1) getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i64 0, i64 0), i128 %.5.5)
+  %.5.6 = tail call i128 @fib(i128 6)
+  %.7.6 = tail call i128 (i8*, ...) @printf(i8* nonnull dereferenceable(1) getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i64 0, i64 0), i128 %.5.6)
+  %.5.7 = tail call i128 @fib(i128 7)
+  %.7.7 = tail call i128 (i8*, ...) @printf(i8* nonnull dereferenceable(1) getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i64 0, i64 0), i128 %.5.7)
+  %.5.8 = tail call i128 @fib(i128 8)
+  %.7.8 = tail call i128 (i8*, ...) @printf(i8* nonnull dereferenceable(1) getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i64 0, i64 0), i128 %.5.8)
+  %.5.9 = tail call i128 @fib(i128 9)
+  %.7.9 = tail call i128 (i8*, ...) @printf(i8* nonnull dereferenceable(1) getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i64 0, i64 0), i128 %.5.9)
+  ret i128 0
 }
 
-declare i32 @"printf"(i8* %".1", ...)
+; Function Attrs: nofree nounwind
+declare noundef i128 @printf(i8* nocapture noundef readonly, ...) local_unnamed_addr #0
 
-@"fmt" = internal constant [4 x i8] c"%d\0a\00"
-@"fmt_str" = internal constant [4 x i8] c"%s\0a\00"
-define i32 @"fib"(i32 %".1")
-{
+; Function Attrs: nofree nosync nounwind readnone
+define i128 @fib(i128 %.1) local_unnamed_addr #1 {
 entry:
-  %"$n" = alloca i32
-  store i32 %".1", i32* %"$n"
-  %"$n.1" = load i32, i32* %"$n"
-  %"cmpletmp" = icmp sle i32 %"$n.1", 1
-  br i1 %"cmpletmp", label %"then", label %"ifcont"
-then:
-  %"$n.2" = load i32, i32* %"$n"
-  ret i32 %"$n.2"
-ifcont:
-  %"$n.3" = load i32, i32* %"$n"
-  %"subtmp" = sub i32 %"$n.3", 1
-  %".6" = call i32 @"fib"(i32 %"subtmp")
-  %"$n.4" = load i32, i32* %"$n"
-  %"subtmp.1" = sub i32 %"$n.4", 2
-  %".7" = call i32 @"fib"(i32 %"subtmp.1")
-  %"addtmp" = add i32 %".6", %".7"
-  ret i32 %"addtmp"
+  %cmpletmp4 = icmp slt i128 %.1, 2
+  br i1 %cmpletmp4, label %common.ret, label %ifcont
+
+common.ret:                                       ; preds = %ifcont, %entry
+  %accumulator.tr.lcssa = phi i128 [ 0, %entry ], [ %addtmp, %ifcont ]
+  %.1.tr.lcssa = phi i128 [ %.1, %entry ], [ %subtmp.1, %ifcont ]
+  %accumulator.ret.tr = add i128 %.1.tr.lcssa, %accumulator.tr.lcssa
+  ret i128 %accumulator.ret.tr
+
+ifcont:                                           ; preds = %entry, %ifcont
+  %.1.tr6 = phi i128 [ %subtmp.1, %ifcont ], [ %.1, %entry ]
+  %accumulator.tr5 = phi i128 [ %addtmp, %ifcont ], [ 0, %entry ]
+  %subtmp = add nsw i128 %.1.tr6, -1
+  %.6 = tail call i128 @fib(i128 %subtmp)
+  %subtmp.1 = add nsw i128 %.1.tr6, -2
+  %addtmp = add i128 %.6, %accumulator.tr5
+  %cmpletmp = icmp ult i128 %.1.tr6, 4
+  br i1 %cmpletmp, label %common.ret, label %ifcont
 }
+
+attributes #0 = { nofree nounwind }
+attributes #1 = { nofree nosync nounwind readnone }

@@ -19,7 +19,7 @@ class AntraxIRVisitor(ParseTreeVisitor):
         self.printf = None
 
         # funcion main
-        func_type = ir.FunctionType(ir.IntType(32), [])
+        func_type = ir.FunctionType(ir.IntType(128), [])
         main_func = ir.Function(self.__module, func_type, name="main")
         block = main_func.append_basic_block(name="entry")
    
@@ -28,7 +28,7 @@ class AntraxIRVisitor(ParseTreeVisitor):
         
         # Declarar printf
         voidptr_ty = ir.IntType(8).as_pointer()
-        printf_ty = ir.FunctionType(ir.IntType(32), [voidptr_ty], var_arg=True)
+        printf_ty = ir.FunctionType(ir.IntType(128), [voidptr_ty], var_arg=True)
         self.printf = ir.Function(self.__module, printf_ty, name="printf")
 
         # Declarar formato para imprimir enteros
@@ -57,6 +57,14 @@ class AntraxIRVisitor(ParseTreeVisitor):
         self.formato_str_ptr = format_str_var
 
 
+        formato_float = ir.Constant(ir.ArrayType(ir.IntType(8), 3), bytearray(b"%f\0"))
+        formato_float_global = ir.GlobalVariable(self.__module, formato_float.type, "float_format")
+        formato_float_global.linkage = "internal"
+        formato_float_global.global_constant = True
+        formato_float_global.initializer = formato_float
+        self.formato_float_ptr = formato_float_global
+
+
 
     # visitors
 
@@ -66,7 +74,7 @@ class AntraxIRVisitor(ParseTreeVisitor):
         """
         for statement in ctx.stat():
             self.visit(statement)
-        self.__builder.ret(ir.Constant(ir.IntType(32), 0))
+        self.__builder.ret(ir.Constant(ir.IntType(128), 0))
         return self.__module
 
     def visitStat(self, ctx: AntraxParser.StatContext):
@@ -178,7 +186,7 @@ class AntraxIRVisitor(ParseTreeVisitor):
             # Obtener puntero al inicio de la cadena
             str_ptr = self.__builder.gep(
                 str_var,
-                [ir.Constant(ir.IntType(32), 0), ir.Constant(ir.IntType(32), 0)],
+                [ir.Constant(ir.IntType(128), 0), ir.Constant(ir.IntType(128), 0)],
                 name="str_ptr",
             )
 
@@ -192,9 +200,18 @@ class AntraxIRVisitor(ParseTreeVisitor):
         elif ctx.expr():
             expr_value = self.visit(ctx.expr())
 
-            formato_ptr = self.__builder.bitcast(
-                self.formato_ptr, ir.IntType(8).as_pointer()
-            )
+            if expr_value.type == ir.IntType(128):
+
+                formato_ptr = self.__builder.bitcast(
+                    self.formato_ptr, ir.IntType(8).as_pointer()
+                )
+            # si es float
+            elif expr_value.type == ir.FloatType():
+    # Para floats
+                formato_ptr = self.__builder.bitcast(
+                    self.formato_float_ptr,
+                    ir.IntType(8).as_pointer()
+                )
             self.__builder.call(self.printf, [formato_ptr, expr_value])
 
     def visitWhileStat(self, ctx: AntraxParser.WhileStatContext):
@@ -292,12 +309,22 @@ class AntraxIRVisitor(ParseTreeVisitor):
             right = self.visit(ctx.exprMul(i))
             op = ctx.getChild(2 * i - 1).getText()  # operadores están entre operandos
 
-            if op == "+":
-                left = self.__builder.add(left, right, name="addtmp")
-            elif op == "-":
-                left = self.__builder.sub(left, right, name="subtmp")
+            # Sumar o restar enteros
+            if left.type == ir.IntType(128) and right.type == ir.IntType(128):
 
+                if op == "+":
+                    left = self.__builder.add(left, right, name="addtmp")
+                elif op == "-":
+                    left = self.__builder.sub(left, right, name="subtmp")
+            else:
+                # Sumar o restar flotantes
+                if op == "+":
+                    left = self.__builder.fadd(left, right, name="addftmp")
+                elif op == "-":
+                    left = self.__builder.fsub(left, right, name="subftmp")
+                
         return left
+
 
 
     # Visit a parse tree produced by AntraxParser#exprMul.
@@ -320,7 +347,12 @@ class AntraxIRVisitor(ParseTreeVisitor):
         if ctx.getChildCount() == 3 and ctx.getChild(0).getText() == "(":
             return self.visit(ctx.expr())
         if ctx.NUM():
-            return ir.Constant(ir.IntType(32), int(ctx.NUM().getText()))
+          
+            if ctx.NUM().getText().isdigit():
+                return ir.Constant(ir.IntType(128), (ctx.NUM().getText()))
+            else:
+                return ir.Constant(ir.FloatType(), float(ctx.NUM().getText()))
+          
         if ctx.ID():
             var_name = ctx.ID().getText()
             if var_name in self.__variables:
@@ -332,7 +364,7 @@ class AntraxIRVisitor(ParseTreeVisitor):
         if ctx.STRING():
             return self.__builder.constant_string(ctx.STRING().getText())
 
-        return ir.Constant(ir.IntType(32), 0)  # Retorno por defecto en caso de error
+        return ir.Constant(ir.IntType(128), 0)  # Retorno por defecto en caso de error
         
 
     
@@ -449,7 +481,7 @@ class AntraxIRVisitor(ParseTreeVisitor):
 
     def __getType (self, type_str):
         if type_str == "int":
-            return ir.IntType(32)
+            return ir.IntType(128)
         elif type_str == "float":
             return ir.FloatType()
         elif type_str == "boolean":

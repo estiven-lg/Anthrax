@@ -1,0 +1,6 @@
+Program antrax {
+    
+    float $a1 = 100.0 + 50.0
+print($a1);
+
+}

@@ -58,19 +58,6 @@ retStat: RETURN (STRING | expr);
 funcCall: FID '(' (expr (',' expr)*)? ')';
 
 
-
-// estructura de una expresión ya sea operaciones aritméticas o de comparación booleana
-// expr:
-// 	expr (MULT | DIV) expr
-// 	| expr (PLUS | MINUS) expr
-// 	| '(' expr ')'
-// 	| NUM
-// 	| expr (LT | GT | LEQ | GEQ | EQ | NEQ) expr
-// 	| ID
-// 	| funcCall
-// 	| STRING;
-
-// estructura de una expresión ya sea operaciones aritméticas o de comparación booleana
 expr:
 	exprBool
 	;

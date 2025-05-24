@@ -125,168 +125,120 @@ class MenuBar(tk.Menu):
         self.add_cascade(label="Compilacion", menu=complie_menu, background="#151e21")
         self.add_cascade(label="Ayuda", menu=help_menu, background="#151e21")
 
+    def log_step(self, message, start_time):
+        elapsed = time.time() - start_time
+        self.master.write_to_console(f"{message}: {elapsed:.3f} segundos")
+        return time.time()
+
     def execute_nx_with_opt(self):
         try:
-            start_time = time.time()
+            self.master.write_to_console("Ejecutando .nx con optimización")
+            t = time.time()
 
-            self.master.write_to_console("Ejecutando .nx con optimizacion")
-
+            # Análisis Léxico y Sintáctico
             tree = compiler.Lexical_Syntactic_Analysis(
                 self.master.inputTxt.get("1.0", tk.END)
             )
-            self.master.write_to_console(
-                "Analisis Lexico y Sintactico" + str(time.time() - start_time) + " segundos"
-            )
+            t = self.log_step("Análisis Léxico y Sintáctico", t)
 
+            # Generación de código intermedio
             module_ir = compiler.Intermediate_Code_Generation(tree)
-            self.master.write_to_console(
-                "Generacion de codigo intermedio"
-                + str(time.time() - start_time)
-                + " segundos"
-            )
+            t = self.log_step("Generación de Código Intermedio", t)
 
-            passes = "-O2"
-            module_ir = compiler.Intermediate_Code_Optimization(module_ir, passes=passes)
-            self.master.write_to_console(
-                "Optimizacion de codigo intermedio"
-                + str(time.time() - start_time)
-                + " segundos"
-            )
+            # Optimización
+            module_ir = compiler.Intermediate_Code_Optimization(module_ir, passes="-O2")
+            t = self.log_step("Optimización de Código Intermedio", t)
 
+            # Guardado
             compiler.save_intermediate_code(module_ir, app.file_name)
-            self.master.write_to_console(
-                "Guardando codigo intermedio" + str(time.time() - start_time) + " segundos"
-            )
+            t = self.log_step("Guardando Código Intermedio", t)
 
+            # Generación binaria
             compiler.bin_generate(app.file_name, app.file_name)
-            self.master.write_to_console(
-                "Generando archivo Binario" + str(time.time() - start_time) + " segundos"
-            )
+            t = self.log_step("Generación de Archivo Binario", t)
 
+            # Ejecución
             results = compiler.bin_execute(app.file_name)
-            self.master.write_to_console(
-                "Ejecutando archivo Binario" + str(time.time() - start_time) + " segundos"
-            )
+            t = self.log_step("Ejecución de Archivo Binario", t)
 
+            # Resultados
             self.master.write_to_console("======================")
             self.master.write_to_console(results.stdout)
-
             if results.stderr:
-                self.master.write_to_console(
-                    "Error de ejecucion: " + results.stderr,"error"
-                )
-
-            self.master.write_to_console("fin de ejecucion" + str(time.time() - start_time) + " segundos")
+                self.master.write_to_console("Error de ejecución: " + results.stderr, "error")
+            self.master.write_to_console("Fin de ejecución")
             self.master.write_to_console("======================")
+
         except Exception as e:
-            print('error',e)
-            self.master.write_to_console(
-                "Error: " + str(e), "error"
-            )
+            print('error', e)
+            self.master.write_to_console("Error: " + str(e), "error")
+            self.master.write_to_console("======================")
+
 
     def execute_nx_without_opt(self):
         try:
-            start_time = time.time()
-
-            self.master.write_to_console("Ejecutando .nx sin optimizacion")
+            self.master.write_to_console("Ejecutando .nx sin optimización")
+            t = time.time()
 
             tree = compiler.Lexical_Syntactic_Analysis(
                 self.master.inputTxt.get("1.0", tk.END)
             )
-            self.master.write_to_console(
-                "Analisis Lexico y Sintactico" + str(time.time() - start_time) + " segundos"
-            )
+            t = self.log_step("Análisis Léxico y Sintáctico", t)
 
             module_ir = compiler.Intermediate_Code_Generation(tree)
-            self.master.write_to_console(
-                "Generacion de codigo intermedio"
-                + str(time.time() - start_time)
-                + " segundos"
-            )
+            t = self.log_step("Generación de Código Intermedio", t)
 
             compiler.save_intermediate_code(module_ir, app.file_name)
-            self.master.write_to_console(
-                "Guardando codigo intermedio" + str(time.time() - start_time) + " segundos"
-            )
+            t = self.log_step("Guardando Código Intermedio", t)
 
             compiler.bin_generate(app.file_name, app.file_name)
-            self.master.write_to_console(
-                "Generando archivo Binario" + str(time.time() - start_time) + " segundos"
-            )
+            t = self.log_step("Generación de Archivo Binario", t)
 
             results = compiler.bin_execute(app.file_name)
-            self.master.write_to_console(
-                "Ejecutando archivo Binario" + str(time.time() - start_time) + " segundos"
-            )
+            t = self.log_step("Ejecución de Archivo Binario", t)
 
             self.master.write_to_console("======================")
             self.master.write_to_console(results.stdout)
-
             if results.stderr:
-                self.master.write_to_console(
-                    "Error de ejecucion: " + results.stderr,"error"
-                )
-
-            self.master.write_to_console("fin de ejecucion" + str(time.time() - start_time) + " segundos")
+                self.master.write_to_console("Error de ejecución: " + results.stderr, "error")
+            self.master.write_to_console("Fin de ejecución")
             self.master.write_to_console("======================")
+
         except Exception as e:
-            print('error',e)
-            self.master.write_to_console(
-                "Error: " + str(e), "error"
-            )
+            print('error', e)
+            self.master.write_to_console("Error: " + str(e), "error")
             self.master.write_to_console("======================")
-
 
 
     def execute_nx_generate_exe(self):
         try:
-            start_time = time.time()
-
             self.master.write_to_console("Generando .exe")
+            t = time.time()
 
             tree = compiler.Lexical_Syntactic_Analysis(
                 self.master.inputTxt.get("1.0", tk.END)
             )
-            self.master.write_to_console(
-                "Analisis Lexico y Sintactico" + str(time.time() - start_time) + " segundos"
-            )
+            t = self.log_step("Análisis Léxico y Sintáctico", t)
 
             module_ir = compiler.Intermediate_Code_Generation(tree)
-            self.master.write_to_console(
-                "Generacion de codigo intermedio"
-                + str(time.time() - start_time)
-                + " segundos"
-            )
+            t = self.log_step("Generación de Código Intermedio", t)
 
-            passes = "-O2"
-            module_ir = compiler.Intermediate_Code_Optimization(module_ir, passes=passes)
-            self.master.write_to_console(
-                "Optimizacion de codigo intermedio"
-                + str(time.time() - start_time)
-                + " segundos"
-            )
+            module_ir = compiler.Intermediate_Code_Optimization(module_ir, passes="-O2")
+            t = self.log_step("Optimización de Código Intermedio", t)
 
             compiler.save_intermediate_code(module_ir, app.file_name)
-            self.master.write_to_console(
-                "Guardando codigo intermedio" + str(time.time() - start_time) + " segundos"
-            )
+            t = self.log_step("Guardando Código Intermedio", t)
 
             compiler.generate_exe(app.file_name, app.file_name)
-            self.master.write_to_console(
-                "Generando archivo .exe" + str(time.time() - start_time) + " segundos"
-            )
+            t = self.log_step("Generación de Archivo .exe", t)
 
-            self.master.write_to_console(
-                "archivo .exe generado en ./exe/" + app.file_name + ".exe"
-            )
+            self.master.write_to_console(f"Archivo .exe generado en ./exe/{app.file_name}.exe")
             self.master.write_to_console("======================")
+
         except Exception as e:
-            print('error',e)
-            self.master.write_to_console(
-                "Error: " + str(e), "error"
-            )
+            print('error', e)
+            self.master.write_to_console("Error: " + str(e), "error")
             self.master.write_to_console("======================")
-
 
 
     def execute_ll(self):
@@ -349,131 +301,96 @@ class MenuBar(tk.Menu):
             )
             self.master.write_to_console("======================")
 
-    def generate_ll_without_opt(self):
+
+    def execute_ll(self):
         try:
-            start_time = time.time()
-            self.master.write_to_console("Generando .ll sin optimizacion")
+            self.master.write_to_console("Ejecutando .ll")
 
-            tree = compiler.Lexical_Syntactic_Analysis(
-                self.master.inputTxt.get("1.0", tk.END)
-            )
-            self.master.write_to_console(
-                "Analisis Lexico y Sintactico" + str(time.time() - start_time) + " segundos"
-            )
+            total_start = time.time()
 
-            module_ir = compiler.Intermediate_Code_Generation(tree)
-            self.master.write_to_console(
-                "Generacion de codigo intermedio"
-                + str(time.time() - start_time)
-                + " segundos"
-            )
-
+            start = time.time()
+            module_ir = self.master.inputTxt.get("1.0", tk.END)
             compiler.save_intermediate_code(module_ir, app.file_name)
-            self.master.write_to_console(
-                "Guardando codigo intermedio" + str(time.time() - start_time) + " segundos"
-            )
+            self.master.write_to_console(f"Guardando código intermedio: {time.time() - start:.3f} segundos")
 
-            self.master.changeFile("./ll/" + app.file_name + ".ll")
-            self.master.write_to_console(
-                "archivo .ll generado en ./ll/" + app.file_name + ".ll"
-            )
+            start = time.time()
+            compiler.bin_generate(app.file_name, app.file_name)
+            self.master.write_to_console(f"Generando archivo Binario: {time.time() - start:.3f} segundos")
+
+            start = time.time()
+            results = compiler.bin_execute(app.file_name)
+            self.master.write_to_console(f"Ejecutando archivo Binario: {time.time() - start:.3f} segundos")
+
             self.master.write_to_console("======================")
+            self.master.write_to_console(results.stdout)
+
+            if results.stderr:
+                self.master.write_to_console("Error de ejecución: " + results.stderr, "error")
+
+            self.master.write_to_console(f"Fin de ejecución: {time.time() - total_start:.3f} segundos")
+            self.master.write_to_console("======================")
+
         except Exception as e:
-            print('error',e)
-            self.master.write_to_console(
-                "Error: " + str(e), "error"
-            )
+            print("error", e)
+            self.master.write_to_console("Error: " + str(e), "error")
             self.master.write_to_console("======================")
 
-
-    def generate_ll_with_opt(self):
+    def execute_ll_generate_exe(self):
         try:
-            start_time = time.time()
-            self.master.write_to_console("Generando .ll con optimizacion")
+            self.master.write_to_console("Generando .exe desde código .ll")
 
-            tree = compiler.Lexical_Syntactic_Analysis(
-                self.master.inputTxt.get("1.0", tk.END)
-            )
-            self.master.write_to_console(
-                "Analisis Lexico y Sintactico" + str(time.time() - start_time) + " segundos"
-            )
+            total_start = time.time()
 
-            module_ir = compiler.Intermediate_Code_Generation(tree)
-            self.master.write_to_console(
-                "Generacion de codigo intermedio"
-                + str(time.time() - start_time)
-                + " segundos"
-            )
-
-            passes = "-O2"
-            module_ir = compiler.Intermediate_Code_Optimization(module_ir, passes=passes)
-            self.master.write_to_console(
-                "Optimizacion de codigo intermedio"
-                + str(time.time() - start_time)
-                + " segundos"
-            )
-
+            start = time.time()
+            module_ir = self.master.inputTxt.get("1.0", tk.END)
             compiler.save_intermediate_code(module_ir, app.file_name)
-            self.master.write_to_console(
-                "Guardando codigo intermedio" + str(time.time() - start_time) + " segundos"
-            )
+            self.master.write_to_console(f"Guardando código intermedio: {time.time() - start:.3f} segundos")
 
-            self.master.changeFile("./ll/" + app.file_name + ".ll")
-            self.master.write_to_console(
-                "archivo .ll generado en ./ll/" + app.file_name + ".ll"
-            )
+            start = time.time()
+            compiler.generate_exe(app.file_name, app.file_name)
+            self.master.write_to_console(f"Generando archivo .exe: {time.time() - start:.3f} segundos")
+
+            self.master.write_to_console(f"Archivo .exe generado en ./exe/{app.file_name}.exe")
+            self.master.write_to_console(f"Tiempo total: {time.time() - total_start:.3f} segundos")
             self.master.write_to_console("======================")
+
         except Exception as e:
-            print('error',e)
-            self.master.write_to_console(
-                "Error: " + str(e), "error"
-            )
+            print("error", e)
+            self.master.write_to_console("Error: " + str(e), "error")
             self.master.write_to_console("======================")
+
+
 
     def generate_ll_with_manual_opt(self):
         try:
-            start_time = time.time()
-            self.master.write_to_console("Generando .ll con optimizacion")
+            self.master.write_to_console("Generando .ll con optimización manual")
+            total_start = time.time()
 
-            tree = compiler.Lexical_Syntactic_Analysis(
-                self.master.inputTxt.get("1.0", tk.END)
-            )
-            self.master.write_to_console(
-                "Analisis Lexico y Sintactico" + str(time.time() - start_time) + " segundos"
-            )
+            start = time.time()
+            tree = compiler.Lexical_Syntactic_Analysis(self.master.inputTxt.get("1.0", tk.END))
+            self.master.write_to_console(f"Análisis Léxico y Sintáctico: {time.time() - start:.3f} segundos")
 
+            start = time.time()
             module_ir = compiler.Intermediate_Code_Generation(tree)
-            self.master.write_to_console(
-                "Generacion de codigo intermedio"
-                + str(time.time() - start_time)
-                + " segundos"
-            )
+            self.master.write_to_console(f"Generación de código intermedio: {time.time() - start:.3f} segundos")
 
-            passes = "-O2"
-            module_ir = compiler.Intermediate_Code_Optimization(module_ir, passes=passes)
-            self.master.write_to_console(
-                "Optimizacion de codigo intermedio"
-                + str(time.time() - start_time)
-                + " segundos"
-            )
+            start = time.time()
+            module_ir = compiler.Intermediate_Code_Optimization(module_ir, passes="-O2")
+            self.master.write_to_console(f"Optimización manual: {time.time() - start:.3f} segundos")
 
+            start = time.time()
             compiler.save_intermediate_code(module_ir, app.file_name)
-            self.master.write_to_console(
-                "Guardando codigo intermedio" + str(time.time() - start_time) + " segundos"
-            )
+            self.master.write_to_console(f"Guardando código intermedio: {time.time() - start:.3f} segundos")
 
-            self.master.changeFile("./ll/" + app.file_name + ".ll")
-            self.master.write_to_console(
-                "archivo .ll generado en ./ll/" + app.file_name + ".ll"
-            )
+            self.master.changeFile(f"./ll/{app.file_name}.ll")
+            self.master.write_to_console(f"Archivo .ll generado en ./ll/{app.file_name}.ll")
+            self.master.write_to_console(f"Tiempo total: {time.time() - total_start:.3f} segundos")
             self.master.write_to_console("======================")
+
         except Exception as e:
-            print('error',e)
-            self.master.write_to_console(
-                "Error: " + str(e), "error"
-            )
+            print("error", e)
+            self.master.write_to_console("Error: " + str(e), "error")
             self.master.write_to_console("======================")
-
 
 
 class PopupWindowConfirmation:

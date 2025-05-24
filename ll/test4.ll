@@ -1,29 +1,18 @@
-; ModuleID = "AntraxModule"
+; ModuleID = './ll/temp.ll'
+source_filename = "./ll/temp.ll"
 target triple = "x86_64-pc-linux-gnu"
-target datalayout = ""
 
-define i32 @"main"()
-{
+@fmt = internal constant [4 x i8] c"%d\0A\00"
+
+; Function Attrs: nofree nounwind
+define i128 @main() local_unnamed_addr #0 {
 entry:
-  %"$num1" = alloca i32
-  %"addtmp" = add i32 10, 5
-  %"multmp" = mul i32 %"addtmp", 2
-  store i32 %"multmp", i32* %"$num1"
-  %"$num2" = alloca i32
-  %"$num1.1" = load i32, i32* %"$num1"
-  %"divtmp" = sdiv i32 %"$num1.1", 3
-  %"subtmp" = sub i32 %"divtmp", 1
-  store i32 %"subtmp", i32* %"$num2"
-  %"$num1.2" = load i32, i32* %"$num1"
-  %".4" = bitcast [4 x i8]* @"fmt" to i8*
-  %".5" = call i32 (i8*, ...) @"printf"(i8* %".4", i32 %"$num1.2")
-  %"$num2.1" = load i32, i32* %"$num2"
-  %".6" = bitcast [4 x i8]* @"fmt" to i8*
-  %".7" = call i32 (i8*, ...) @"printf"(i8* %".6", i32 %"$num2.1")
-  ret i32 0
+  %.5 = tail call i128 (i8*, ...) @printf(i8* nonnull dereferenceable(1) getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i64 0, i64 0), i128 30)
+  %.7 = tail call i128 (i8*, ...) @printf(i8* nonnull dereferenceable(1) getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i64 0, i64 0), i128 9)
+  ret i128 0
 }
 
-declare i32 @"printf"(i8* %".1", ...)
+; Function Attrs: nofree nounwind
+declare noundef i128 @printf(i8* nocapture noundef readonly, ...) local_unnamed_addr #0
 
-@"fmt" = internal constant [4 x i8] c"%d\0a\00"
-@"fmt_str" = internal constant [4 x i8] c"%s\0a\00"
+attributes #0 = { nofree nounwind }
