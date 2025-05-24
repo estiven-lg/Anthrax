@@ -302,10 +302,9 @@ class MenuBar(tk.Menu):
             self.master.write_to_console("======================")
 
 
-
-    def generate_ll_with_manual_opt(self):
+    def generate_ll_without_opt(self):
         try:
-            self.master.write_to_console("Generando .ll con optimización manual")
+            self.master.write_to_console("Generando .ll sin optimización")
             total_start = time.time()
 
             start = time.time()
@@ -315,10 +314,6 @@ class MenuBar(tk.Menu):
             start = time.time()
             module_ir = compiler.Intermediate_Code_Generation(tree)
             self.master.write_to_console(f"Generación de código intermedio: {time.time() - start:.3f} segundos")
-
-            start = time.time()
-            module_ir = compiler.Intermediate_Code_Optimization(module_ir, passes="-O2")
-            self.master.write_to_console(f"Optimización manual: {time.time() - start:.3f} segundos")
 
             start = time.time()
             compiler.save_intermediate_code(module_ir, app.file_name)
@@ -333,7 +328,6 @@ class MenuBar(tk.Menu):
             print("error", e)
             self.master.write_to_console("Error: " + str(e), "error")
             self.master.write_to_console("======================")
-
 
     def generate_ll_with_opt(self):
         try:

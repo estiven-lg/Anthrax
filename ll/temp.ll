@@ -5,25 +5,40 @@ target datalayout = ""
 define i128 @"main"()
 {
 entry:
-  %"$password" = alloca i128
-  store i128 123554, i128* %"$password"
-  %"$password.1" = load i128, i128* %"$password"
-  %"cmpeqtmp" = icmp eq i128 %"$password.1", 1234
-  br i1 %"cmpeqtmp", label %"then", label %"else"
-then:
-  %"str_ptr" = getelementptr [17 x i8], [17 x i8]* @".str.956", i128 0, i128 0
-  %".4" = bitcast [4 x i8]* @"fmt_str" to i8*
-  %".5" = call i128 (i8*, ...) @"printf"(i8* %".4", i8* %"str_ptr")
-  br label %"ifcont"
-else:
-  %"str_ptr.1" = getelementptr [16 x i8], [16 x i8]* @".str.592", i128 0, i128 0
-  %".7" = bitcast [4 x i8]* @"fmt_str" to i8*
-  %".8" = call i128 (i8*, ...) @"printf"(i8* %".7", i8* %"str_ptr.1")
-  %"str_ptr.2" = getelementptr [26 x i8], [26 x i8]* @".str.42", i128 0, i128 0
-  %".9" = bitcast [4 x i8]* @"fmt_str" to i8*
-  %".10" = call i128 (i8*, ...) @"printf"(i8* %".9", i8* %"str_ptr.2")
-  br label %"ifcont"
-ifcont:
+  %"$i" = alloca i128
+  store i128 0, i128* %"$i"
+  br label %"while.cond"
+while.cond:
+  %"$i.1" = load i128, i128* %"$i"
+  %"cmplttmp" = icmp slt i128 %"$i.1", 5
+  br i1 %"cmplttmp", label %"while.body", label %"while.end"
+while.body:
+  %"$i.2" = load i128, i128* %"$i"
+  %".5" = bitcast [4 x i8]* @"fmt" to i8*
+  %".6" = call i128 (i8*, ...) @"printf"(i8* %".5", i128 %"$i.2")
+  %"$i.3" = load i128, i128* %"$i"
+  %"addtmp" = add i128 %"$i.3", 1
+  store i128 %"addtmp", i128* %"$i"
+  br label %"while.cond"
+while.end:
+  %"$j" = alloca i128
+  store i128 1, i128* %"$j"
+  br label %"for.cond"
+for.cond:
+  %"$j.1" = load i128, i128* %"$j"
+  %"cmpletmp" = icmp sle i128 %"$j.1", 5
+  br i1 %"cmpletmp", label %"for.body", label %"for.end"
+for.body:
+  %"str_ptr" = getelementptr [10 x i8], [10 x i8]* @".str.428", i128 0, i128 0
+  %".12" = bitcast [4 x i8]* @"fmt_str" to i8*
+  %".13" = call i128 (i8*, ...) @"printf"(i8* %".12", i8* %"str_ptr")
+  br label %"for.inc"
+for.inc:
+  %"$j.2" = load i128, i128* %"$j"
+  %"addtmp.1" = add i128 %"$j.2", 1
+  store i128 %"addtmp.1", i128* %"$j"
+  br label %"for.cond"
+for.end:
   ret i128 0
 }
 
@@ -32,6 +47,4 @@ declare i128 @"printf"(i8* %".1", ...)
 @"fmt" = internal constant [4 x i8] c"%d\0a\00"
 @"fmt_str" = internal constant [4 x i8] c"%s\0a\00"
 @"float_format" = internal constant [3 x i8] c"%f\00"
-@".str.956" = internal constant [17 x i8] c"Acceso concedido\00"
-@".str.592" = internal constant [16 x i8] c"Acceso denegado\00"
-@".str.42" = internal constant [26 x i8] c"Verifica tus credenciales\00"
+@".str.428" = internal constant [10 x i8] c"Iteracion\00"
