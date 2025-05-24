@@ -302,64 +302,6 @@ class MenuBar(tk.Menu):
             self.master.write_to_console("======================")
 
 
-    def execute_ll(self):
-        try:
-            self.master.write_to_console("Ejecutando .ll")
-
-            total_start = time.time()
-
-            start = time.time()
-            module_ir = self.master.inputTxt.get("1.0", tk.END)
-            compiler.save_intermediate_code(module_ir, app.file_name)
-            self.master.write_to_console(f"Guardando código intermedio: {time.time() - start:.3f} segundos")
-
-            start = time.time()
-            compiler.bin_generate(app.file_name, app.file_name)
-            self.master.write_to_console(f"Generando archivo Binario: {time.time() - start:.3f} segundos")
-
-            start = time.time()
-            results = compiler.bin_execute(app.file_name)
-            self.master.write_to_console(f"Ejecutando archivo Binario: {time.time() - start:.3f} segundos")
-
-            self.master.write_to_console("======================")
-            self.master.write_to_console(results.stdout)
-
-            if results.stderr:
-                self.master.write_to_console("Error de ejecución: " + results.stderr, "error")
-
-            self.master.write_to_console(f"Fin de ejecución: {time.time() - total_start:.3f} segundos")
-            self.master.write_to_console("======================")
-
-        except Exception as e:
-            print("error", e)
-            self.master.write_to_console("Error: " + str(e), "error")
-            self.master.write_to_console("======================")
-
-    def execute_ll_generate_exe(self):
-        try:
-            self.master.write_to_console("Generando .exe desde código .ll")
-
-            total_start = time.time()
-
-            start = time.time()
-            module_ir = self.master.inputTxt.get("1.0", tk.END)
-            compiler.save_intermediate_code(module_ir, app.file_name)
-            self.master.write_to_console(f"Guardando código intermedio: {time.time() - start:.3f} segundos")
-
-            start = time.time()
-            compiler.generate_exe(app.file_name, app.file_name)
-            self.master.write_to_console(f"Generando archivo .exe: {time.time() - start:.3f} segundos")
-
-            self.master.write_to_console(f"Archivo .exe generado en ./exe/{app.file_name}.exe")
-            self.master.write_to_console(f"Tiempo total: {time.time() - total_start:.3f} segundos")
-            self.master.write_to_console("======================")
-
-        except Exception as e:
-            print("error", e)
-            self.master.write_to_console("Error: " + str(e), "error")
-            self.master.write_to_console("======================")
-
-
 
     def generate_ll_with_manual_opt(self):
         try:
@@ -392,6 +334,68 @@ class MenuBar(tk.Menu):
             self.master.write_to_console("Error: " + str(e), "error")
             self.master.write_to_console("======================")
 
+
+    def generate_ll_with_opt(self):
+        try:
+            self.master.write_to_console("Generando .ll con optimización")
+            total_start = time.time()
+
+            start = time.time()
+            tree = compiler.Lexical_Syntactic_Analysis(self.master.inputTxt.get("1.0", tk.END))
+            self.master.write_to_console(f"Análisis Léxico y Sintáctico: {time.time() - start:.3f} segundos")
+
+            start = time.time()
+            module_ir = compiler.Intermediate_Code_Generation(tree)
+            self.master.write_to_console(f"Generación de código intermedio: {time.time() - start:.3f} segundos")
+
+            start = time.time()
+            module_ir = compiler.Intermediate_Code_Optimization(module_ir, passes="-O2")
+            self.master.write_to_console(f"Optimización: {time.time() - start:.3f} segundos")
+
+            start = time.time()
+            compiler.save_intermediate_code(module_ir, app.file_name)
+            self.master.write_to_console(f"Guardando código intermedio: {time.time() - start:.3f} segundos")
+
+            self.master.changeFile(f"./ll/{app.file_name}.ll")
+            self.master.write_to_console(f"Archivo .ll generado en ./ll/{app.file_name}.ll")
+            self.master.write_to_console(f"Tiempo total: {time.time() - total_start:.3f} segundos")
+            self.master.write_to_console("======================")
+
+        except Exception as e:
+            print("error", e)
+            self.master.write_to_console("Error: " + str(e), "error")
+            self.master.write_to_console("======================")
+
+    def generate_ll_with_manual_opt(self):
+        try:
+            self.master.write_to_console("Generando .ll con optimización manual")
+            total_start = time.time()
+
+            start = time.time()
+            tree = compiler.Lexical_Syntactic_Analysis(self.master.inputTxt.get("1.0", tk.END))
+            self.master.write_to_console(f"Análisis Léxico y Sintáctico: {time.time() - start:.3f} segundos")
+
+            start = time.time()
+            module_ir = compiler.Intermediate_Code_Generation(tree)
+            self.master.write_to_console(f"Generación de código intermedio: {time.time() - start:.3f} segundos")
+
+            start = time.time()
+            module_ir = compiler.Intermediate_Code_Optimization(module_ir, passes="-O2")
+            self.master.write_to_console(f"Optimización manual: {time.time() - start:.3f} segundos")
+
+            start = time.time()
+            compiler.save_intermediate_code(module_ir, app.file_name)
+            self.master.write_to_console(f"Guardando código intermedio: {time.time() - start:.3f} segundos")
+
+            self.master.changeFile(f"./ll/{app.file_name}.ll")
+            self.master.write_to_console(f"Archivo .ll generado en ./ll/{app.file_name}.ll")
+            self.master.write_to_console(f"Tiempo total: {time.time() - total_start:.3f} segundos")
+            self.master.write_to_console("======================")
+
+        except Exception as e:
+            print("error", e)
+            self.master.write_to_console("Error: " + str(e), "error")
+            self.master.write_to_console("======================")
 
 class PopupWindowConfirmation:
     def __init__(self, parent):
